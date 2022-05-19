@@ -12,8 +12,6 @@ const status = require('http-status')
 exports.register = async (req, res) => {
   let { fullName, userName, email,password } =
     req.body;
-
-    console.log(req.body);
   let sendMail = false;
   if (password == undefined) {
     password = generator.generate({

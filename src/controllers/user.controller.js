@@ -1,4 +1,5 @@
 const User = require("../models/user.model");
+const stripe = require('stripe')(process.env.APP_URL)
 const Sequelize = require('sequelize');
 
 exports.index = async (req, res) => {
@@ -151,3 +152,43 @@ exports.deleteUser = async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 };
+
+exports.stripePayment = async (req, res) => {
+  try{
+    const createCharge = await stripe.chagres.create({
+      email :req.body.email,
+      amount : req.body.amount,
+      card: req.body.card,
+      customer_id: req.body.customer_id,
+      currency: req.body.currency,
+    })
+  res.status(200).send({
+    createCharge,
+    status: "Success",
+    // message:"Successfully Paid"
+  });
+  }catch(err){
+    res.status(500).send({ message: error.message });
+  }
+}
+
+
+exports.contact = async(req, res)=>{
+  let { subject, category, email,message } =
+    req.body;
+  try{
+    const user = await User.create({
+      subject,
+      category,
+      email,
+      message,
+    });
+    res.status(200).send({
+      status: "success",
+      data: user,
+      message: "Success",
+    });
+  }catch (err){
+    res.status(500).send({ message: error.message });
+  }
+}
