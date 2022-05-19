@@ -52,15 +52,6 @@ User.init(
     password: {
       type: DataTypes.STRING,
     },
-    message: {
-      type: DataTypes.STRING,
-    },
-    subject: {
-      type: DataTypes.STRING,
-    },
-    category: {
-      type: DataTypes.STRING,
-    },
   },
   {
     sequelize,
