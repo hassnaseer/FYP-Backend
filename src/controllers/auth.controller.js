@@ -38,6 +38,7 @@ exports.register = async (req, res) => {
     res.status(200).send({
       status: "success",
       data: user,
+      message: "User Registered Successfully.",
       // accessToken: token,
     });
   } catch (error) {
@@ -47,23 +48,22 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    req.body.phone = req.body.phone == undefined ? "" : req.body.phone;
     const user = await User.findOne({
       attributes: [
         'userName',
         'password',
-        'email',
       ],
       where: {
-        [Op.or]: [
-          sequelize.where(sequelize.fn('lower', sequelize.col('email')),
-            sequelize.fn('lower', req.body.email))]
-      },
+        userName: req.body.userName
+      }
     });
 
-      if (!user) {
-        return res.status(404).send({ message: "Incorrect Email Or Password!" });
-      }
+    if(!user){
+      return res.status(400).send({
+        accessToken: null,
+        message: "User is not Exist",
+      });
+    }
       var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
 
       if (!passwordIsValid) {
@@ -77,6 +77,7 @@ exports.login = async (req, res) => {
     res.status(200).send({
       user: user,
       accessToken: token,
+      message: "Login Successfully",
     });
   } catch (error) {
     res.status(500).send({ message: error.message });
@@ -84,37 +85,33 @@ exports.login = async (req, res) => {
 };
 
 exports.forgotPassword = async (req, res, next) => {
-  const { email } = req.body
-
+  const { email } = req.body;
   const user = await User.findOne({
     where: {
       email,
     },
     include: [ForgotPasswordToken],
-  })
+  });
+
   if (!user)
-    return next(
-      new APIError(
-        'No User found with the email address',
-        status.BAD_REQUEST
-      )
-    )
+    return next(new APIError(messages.EMAIL_NOT_FOUND, status.BAD_REQUEST));
 
-  const token = await user.generateForgotPasswordToken(user.id, 2)
-  const subject = 'Forgot Password'
+  const token = await user.generateForgotPasswordToken(user, 32);
+  const frontendUrl = `${process.env.APP_URL}/reset-password?token=${token}`;
 
-  sendForgotPasswordEmail(user.email, subject, token);
+  // sendForgotPasswordEmail(user.email, subject, frontendUrl);
+
+  await new Email(user, frontendUrl).sendForgotPasswordLink();
 
   res.status(status.CREATED).json({
-    status: 'success',
+    status: messages.SUCCESS,
     reset_token: token,
   });
-}
+};
 
-exports.resetPassword = async (req, res, next) => {
-  const { email, password, token } = req.body
-
-  const hashedToken = User.createHashFromString(token)
+exports.matchToken = async (req, res, next) => {
+  const { token } = req.body;
+  const hashedToken = User.createHashFromString(token);
 
   const user = await User.findOne({
     include: [
@@ -128,19 +125,49 @@ exports.resetPassword = async (req, res, next) => {
         },
       },
     ],
-  })
+  });
 
   if (!user)
-    return next(
-      new APIError('Your session has been expired!', status.UNAUTHORIZED)
-    )
-
-  user.password = bcrypt.hashSync(password, 8)
-  await user.ForgotPasswordToken.destroy()
-
-  await user.save()
+    return next(new APIError(messages.INVALID_TOKEN, status.UNAUTHORIZED));
 
   res.status(status.OK).json({
-    status: 'success',
-  })
-}
+    status: messages.SUCCESS,
+    message: messages.TOKEN_MATCHED,
+  });
+};
+
+exports.resetPassword = async (req, res, next) => {
+  const { password, token } = req.body;
+
+  const hashedToken = User.createHashFromString(token);
+
+  const user = await User.findOne({
+    include: [
+      {
+        model: ForgotPasswordToken,
+        where: {
+          token: hashedToken,
+          expiresIn: {
+            [Op.gte]: Date.now(),
+          },
+        },
+      },
+    ],
+  });
+
+  if (!user)
+    return next(new APIError(messages.INVALID_TOKEN, status.UNAUTHORIZED));
+
+  user.password = bcrypt.hashSync(password, 8);
+  await user.ForgotPasswordToken.destroy();
+
+  await user.save();
+
+  const accessToken = user.getJWTToken();
+
+  res.status(status.OK).json({
+    status: messages.SUCCESS,
+    user: user,
+    accessToken,
+  });
+};
