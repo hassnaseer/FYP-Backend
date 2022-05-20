@@ -1,17 +1,15 @@
-const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 const generator = require("generate-password");
 const { Op } = require("sequelize");
-const { validateEmail } = require('../utils/validateEmail')
-const ForgotPasswordToken = require('../models/forgotPasswordToken.model')
-const { sendEmail,sendForgotPasswordEmail} = require("../utils/sendEmail");
+const { validateEmail } = require("../utils/validateEmail");
+const { sendEmail, sendForgotPasswordEmail } = require("../utils/sendEmail");
 const APIError = require("../utils/APIError.js");
 const sequelize = require("sequelize");
-const status = require('http-status')
+const status = require("http-status");
+const { User, ForgotPasswordToken } = require("../models/index");
 
 exports.register = async (req, res) => {
-  let { fullName, userName, email,password } =
-    req.body;
+  let { fullName, userName, email, password } = req.body;
   let sendMail = false;
   if (password == undefined) {
     password = generator.generate({
@@ -47,29 +45,26 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const user = await User.findOne({
-      attributes: [
-        'userName',
-        'password',
-      ],
+      attributes: ["userName", "password"],
       where: {
-        userName: req.body.userName
-      }
+        userName: req.body.userName,
+      },
     });
 
-    if(!user){
+    if (!user) {
       return res.status(400).send({
         accessToken: null,
         message: "User is not Exist",
       });
     }
-      var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+    var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
 
-      if (!passwordIsValid) {
-        return res.status(401).send({
-          accessToken: null,
-          message: "Incorrect Email Or Password!",
-        });
-      }
+    if (!passwordIsValid) {
+      return res.status(401).send({
+        accessToken: null,
+        message: "Incorrect Email Or Password!",
+      });
+    }
     var token = user.getJWTToken();
 
     res.status(200).send({
@@ -84,6 +79,7 @@ exports.login = async (req, res) => {
 
 exports.forgotPassword = async (req, res, next) => {
   const { email } = req.body;
+  const subject = "forgetpasswordemail";
   const user = await User.findOne({
     where: {
       email,
@@ -95,14 +91,19 @@ exports.forgotPassword = async (req, res, next) => {
     return next(new APIError(messages.EMAIL_NOT_FOUND, status.BAD_REQUEST));
 
   const token = await user.generateForgotPasswordToken(user, 32);
-  const frontendUrl = `${process.env.APP_URL}/reset-password?token=${token}`;
+  const frontendUrl = `${process.env.APP_URL}resetPassword?token=${token}`;
 
-  // sendForgotPasswordEmail(user.email, subject, frontendUrl);
+  await sendForgotPasswordEmail(user.email, subject, frontendUrl);
 
-  await new Email(user, frontendUrl).sendForgotPasswordLink();
-
+  await User.update(
+    {
+      token: token,
+    },
+    { where: { email } }
+  );
   res.status(status.CREATED).json({
-    status: messages.SUCCESS,
+    status: "Success",
+    message:"Please check your Gmail",
     reset_token: token,
   });
 };
@@ -153,8 +154,7 @@ exports.resetPassword = async (req, res, next) => {
     ],
   });
 
-  if (!user)
-    return next(new APIError(messages.INVALID_TOKEN, status.UNAUTHORIZED));
+  if (!user) return next(new APIError("Token is Expired Please Forget Password again", status.UNAUTHORIZED));
 
   user.password = bcrypt.hashSync(password, 8);
   await user.ForgotPasswordToken.destroy();
@@ -164,7 +164,7 @@ exports.resetPassword = async (req, res, next) => {
   const accessToken = user.getJWTToken();
 
   res.status(status.OK).json({
-    status: messages.SUCCESS,
+    status: "Success",
     user: user,
     accessToken,
   });

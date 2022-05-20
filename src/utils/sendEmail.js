@@ -6,24 +6,27 @@ const { prepareForgotPasswordTemplate } = require('./../email_templates/forgot_p
 exports.sendEmail = (email, subject, password) => {
 
   let transporter = nodemailer.createTransport(smtpTransport({
-    host: "smtp.gmail.com",
-    port: 587,
+    host: process.env.MAIL_HOST,
+    port: process.env.MAIL_PORT,
     auth: {
-      user: "faisalmahmood1196@gmail.com",
-      pass: "Faisal@123"
+      user: process.env.MAIL_USER,
+      pass: process.env.MAIL_PASS,
     }
   }));
 
   let mailOptions = {
-    from: 'muhammadfaisal1196@gmail.com',
+    from: 'malik.hassam531@gmail.com',
     to: email,
     subject: subject,
     html: prepareOtpTemplate(password)
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
-    if (error) console.log(error);
-    console.log(info)
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
   });
 
 }
@@ -37,7 +40,6 @@ exports.sendForgotPasswordEmail = (email, subject, code) => {
       pass: process.env.MAIL_PASS
     }
   }));
-  console.log(code);
   let mailOptions = {
     from: process.env.MAIL_USER,
     to: email,
@@ -46,8 +48,11 @@ exports.sendForgotPasswordEmail = (email, subject, code) => {
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
-    if (error) console.log(error);
-    console.log(info)
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
   });
 
 }

@@ -14,6 +14,7 @@ class User extends Model {
   }
 
   async generateForgotPasswordToken(user, len) {
+
     const resetToken = crypto.randomBytes(len).toString('hex')
 
     const hashedToken = User.createHashFromString(resetToken)
@@ -24,13 +25,13 @@ class User extends Model {
     if (this.ForgotPasswordToken) {
       this.ForgotPasswordToken.token = hashedToken
       this.ForgotPasswordToken.expiresIn = expiresIn
-      this.ForgotPasswordToken.userId = user
+      this.ForgotPasswordToken.userId = user.id
       this.ForgotPasswordToken.save()
     } else {
       await ForgotPasswordToken.create({
         token: hashedToken,
         expiresIn,
-        userId: user,
+        userId: user.id,
       })
     }
 

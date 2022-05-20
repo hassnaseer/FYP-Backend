@@ -156,11 +156,7 @@ exports.deleteUser = async (req, res) => {
 exports.stripePayment = async (req, res) => {
   try{
     const createCharge = await stripe.chagres.create({
-      email :req.body.email,
-      amount : req.body.amount,
-      card: req.body.card,
-      customer_id: req.body.customer_id,
-      currency: req.body.currency,
+      token : req.body.token,
     })
   res.status(200).send({
     createCharge,
