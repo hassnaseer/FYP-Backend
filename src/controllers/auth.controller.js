@@ -57,13 +57,15 @@ exports.login = async (req, res) => {
         message: "User is not Exist",
       });
     }
+    var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
 
-    // var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-
-    // if (!passwordIsValid) {
-    // }
-
-    if(user.password === req.body.password){
+    if (!passwordIsValid) {
+      return res.status(401).send({
+        accessToken: null,
+        message: "Incorrect Email Or Password!",
+      });
+    } 
+    if(req.body.password === user.password){
       var token = user.getJWTToken();
   
       res.status(200).send({
@@ -71,13 +73,15 @@ exports.login = async (req, res) => {
         accessToken: token,
         message: "Login Successfully",
       });
-    }else{
-      return res.status(401).send({
-        accessToken: null,
-        message: "Incorrect Email Or Password!",
+    } else{
+      var token = user.getJWTToken();
+  
+      res.status(200).send({
+        user: user,
+        accessToken: token,
+        message: "Login Successfully",
       });
     }
-  
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
@@ -159,17 +163,14 @@ exports.resetPassword = async (req, res, next) => {
       },
     ],
   });
+
   if (!user) return next(new APIError("Token is Expired Please Forget Password again", status.UNAUTHORIZED));
 
-  await User.update(
-    {
-      password: password,
-    },
-    {
-      where: { id: user.id },
-    }
-  );
-  
+  user.password = bcrypt.hashSync(password, 8);
+  await user.ForgotPasswordToken.destroy();
+
+  await user.save();
+
   const accessToken = user.getJWTToken();
 
   res.status(status.OK).json({
