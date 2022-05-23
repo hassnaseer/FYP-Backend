@@ -2,7 +2,6 @@ const Sequelize = require("sequelize");
 require("dotenv").config();
 
 const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME,APP_URL:DATABASE_URL } = process.env;
-console.log({ DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME,DATABASE_URL });
 const sequelize = new Sequelize(DATABASE_URL,{
     dialect: 'postgres',
     protocol: 'postgres',
