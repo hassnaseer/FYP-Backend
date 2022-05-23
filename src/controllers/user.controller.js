@@ -1,6 +1,7 @@
 const User = require("../models/user.model");
 const Contact = require("../models/contact.js");
-const Plan =  require('../models/plansModel')
+const {sendEmail} = require('../utils/sendEmail')
+const Plan = require("../models/plansModel");
 const stripe = require("stripe")(process.env.STRIPE_URL);
 const Sequelize = require("sequelize");
 // const stripe = require('stripe')('sk_test_4eC39HqLyjWDarjtT1zdp7dc');
@@ -166,33 +167,30 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-
 exports.findPlans = async (req, res) => {
-  try{
-
-    const response = await Plan.findAll();
+  try {
+    const response = await Plan.findAll({ order: [["id", "DESC"]] });
     res.status(200).send({
       response,
       status: "Success",
       // message:"Successfully Paid"
     });
-  } catch(err){
-    res.status(500).send({message: err.message});
+  } catch (err) {
+    res.status(500).send({ message: err.message });
   }
 };
 
-exports.stripePayment= async (req,res)=>{
-  try{
+exports.stripePayment = async (req, res) => {
+  try {
     const customer = await stripe.customers.create({
-      description: 'My First Test Customer (created for API docs at https://www.stripe.com/docs/api)',
-      email : req.body.email,
+      description:
+        "My First Test Customer (created for API docs at https://www.stripe.com/docs/api)",
+      email: req.body.email,
       customer: req.body.customer_Id,
     });
     const subscription = await stripe.x.create({
       customer: req.body.stripePaymentId,
-      items: [
-        {price: req.body.price},
-      ],
+      items: [{ price: req.body.price }],
     });
 
     res.status(200).send({
@@ -200,11 +198,10 @@ exports.stripePayment= async (req,res)=>{
       status: "Success",
       // message:"Successfully Paid"
     });
-  }
-  catch(err){
+  } catch (err) {
     res.status(500).send({ message: err.message });
   }
-}
+};
 
 exports.contactRequest = async (req, res) => {
   let { subject, category, email, message } = req.body;
@@ -215,10 +212,11 @@ exports.contactRequest = async (req, res) => {
       email,
       message,
     });
+    await sendEmail(email, subject, message);
     res.status(200).send({
       status: "success",
       data: user,
-      message: "Success",
+      message: "Email sent successfully",
     });
   } catch (err) {
     res.status(500).send({ message: err.message });

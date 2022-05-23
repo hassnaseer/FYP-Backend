@@ -15,7 +15,7 @@ exports.sendEmail = (email, subject, password) => {
   }));
 
   let mailOptions = {
-    from: 'malik.hassam531@gmail.com',
+    from: process.env.MAIL_USER,
     to: email,
     subject: subject,
     html: prepareOtpTemplate(password)
