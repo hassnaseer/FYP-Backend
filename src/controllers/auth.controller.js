@@ -11,6 +11,19 @@ const { User, ForgotPasswordToken } = require("../models/index");
 exports.register = async (req, res) => {
   let { fullName, userName, email, password } = req.body;
   let sendMail = false;
+  const Name = await User.findOne({
+    attributes: ["userName", "password"],
+    where: {
+      userName: req.body.userName,
+    },
+  });
+
+  if (Name) {
+    return res.status(400).send({
+      accessToken: null,
+      message: "User is already Exist",
+    });
+  }
   if (password == undefined) {
     password = generator.generate({
       length: 10,
@@ -30,6 +43,7 @@ exports.register = async (req, res) => {
       user.save();
       sendEmail(email, "One Time Password", password);
     }
+   
     // var token = user.getJWTToken();
     res.status(200).send({
       status: "success",
