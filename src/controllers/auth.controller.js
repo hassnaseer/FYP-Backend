@@ -79,15 +79,12 @@ exports.login = async (req, res) => {
         message: "Incorrect Email Or Password!",
       });
     } 
-    if(req.body.password === user.password){
       var token = user.getJWTToken();
-      
       res.status(200).send({
         user: user,
         accessToken: token,
         message: "Login Successfully",
       });
-    }
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
