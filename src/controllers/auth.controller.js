@@ -71,6 +71,14 @@ exports.login = async (req, res) => {
         message: "User is not Exist",
       });
     }
+    var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+
+    if (!passwordIsValid) {
+      return res.status(401).send({
+        accessToken: null,
+        message: "Incorrect Email Or Password!",
+      });
+    } 
     if(req.body.password === user.password){
       var token = user.getJWTToken();
       
@@ -80,14 +88,6 @@ exports.login = async (req, res) => {
         message: "Login Successfully",
       });
     }
-    var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-
-    if (!passwordIsValid) {
-      return res.status(401).send({
-        accessToken: null,
-        message: "Incorrect Email Or Password!",
-      });
-    } 
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
