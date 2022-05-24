@@ -11,6 +11,19 @@ const { User, ForgotPasswordToken } = require("../models/index");
 exports.register = async (req, res) => {
   let { fullName, userName, email, password } = req.body;
   let sendMail = false;
+  const Name = await User.findOne({
+    attributes: ["userName", "password"],
+    where: {
+      userName: req.body.userName,
+    },
+  });
+
+  if (Name) {
+    return res.status(400).send({
+      accessToken: null,
+      message: "User is already Exist",
+    });
+  }
   if (password == undefined) {
     password = generator.generate({
       length: 10,
@@ -30,6 +43,7 @@ exports.register = async (req, res) => {
       user.save();
       sendEmail(email, "One Time Password", password);
     }
+   
     // var token = user.getJWTToken();
     res.status(200).send({
       status: "success",
@@ -57,27 +71,23 @@ exports.login = async (req, res) => {
         message: "User is not Exist",
       });
     }
-
-    // var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-
-    // if (!passwordIsValid) {
-    // }
-
-    if(user.password === req.body.password){
+    if(req.body.password === user.password){
       var token = user.getJWTToken();
-  
+      
       res.status(200).send({
         user: user,
         accessToken: token,
         message: "Login Successfully",
       });
-    }else{
+    }
+    var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+
+    if (!passwordIsValid) {
       return res.status(401).send({
         accessToken: null,
         message: "Incorrect Email Or Password!",
       });
-    }
-  
+    } 
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
@@ -159,17 +169,14 @@ exports.resetPassword = async (req, res, next) => {
       },
     ],
   });
+
   if (!user) return next(new APIError("Token is Expired Please Forget Password again", status.UNAUTHORIZED));
 
-  await User.update(
-    {
-      password: password,
-    },
-    {
-      where: { id: user.id },
-    }
-  );
-  
+  user.password = bcrypt.hashSync(password, 8);
+  await user.ForgotPasswordToken.destroy();
+
+  await user.save();
+
   const accessToken = user.getJWTToken();
 
   res.status(status.OK).json({
