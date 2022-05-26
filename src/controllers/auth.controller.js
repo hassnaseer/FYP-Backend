@@ -64,7 +64,7 @@ exports.login = async (req, res) => {
     if (!passwordIsValid) {
       return res.status(401).send({
         accessToken: null,
-        message: "Incorrect User Name Or Password!",
+        message: "Incorrect Username Or Password!",
       });
     } 
       var token = user.getJWTToken();
