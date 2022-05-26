@@ -56,7 +56,7 @@ exports.login = async (req, res) => {
     if (!user) {
       return res.status(400).send({
         accessToken: null,
-        message: "User is not Exist",
+        message: "User does'nt exists",
       });
     }
     var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
@@ -155,7 +155,7 @@ exports.resetPassword = async (req, res, next) => {
     ],
   });
 
-  if (!user) return next(new APIError("Token is Expired Please Forget Password again", status.UNAUTHORIZED));
+  if (!user) return next(new APIError("Link is expired, Please forgot password again.", status.UNAUTHORIZED));
 
   user.password = bcrypt.hashSync(password, 8);
   await user.ForgotPasswordToken.destroy();
@@ -167,6 +167,7 @@ exports.resetPassword = async (req, res, next) => {
   res.status(status.OK).json({
     status: "Success",
     user: user,
+    message:"Your Password has been reset Successfully.",
     accessToken,
   });
 };
