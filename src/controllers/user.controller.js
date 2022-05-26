@@ -169,7 +169,9 @@ exports.deleteUser = async (req, res) => {
 
 exports.findPlans = async (req, res) => {
   try {
-    const response = await Plan.findAll({ order: [["id", "DESC"]] });
+    const response = await Plan.findAll(
+      { order: [["id", "ASCE"]] }
+      );
     res.status(200).send({
       response,
       status: "Success",
