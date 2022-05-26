@@ -5,20 +5,19 @@ const { prepareForgotPasswordTemplate } = require('./../email_templates/forgot_p
 
 exports.sendEmail = (email, subject, password) => {
 
-  let transporter = nodemailer.createTransport(smtpTransport({
-    host: process.env.MAIL_HOST,
-    port: process.env.MAIL_PORT,
+  let transporter = nodemailer.createTransport({
+    service: 'gmail',
     auth: {
       user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASS,
+      pass: process.env.MAIL_PASS
     }
-  }));
+  });
 
   let mailOptions = {
     from: process.env.MAIL_USER,
     to: email,
     subject: subject,
-    html: prepareOtpTemplate(password)
+    // html: prepareOtpTemplate(password)
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -32,14 +31,13 @@ exports.sendEmail = (email, subject, password) => {
 }
 exports.sendForgotPasswordEmail = (email, subject, code) => {
 
-  let transporter = nodemailer.createTransport(smtpTransport({
-    host: process.env.MAIL_HOST,
-    port: process.env.MAIL_PORT,
+  let transporter = nodemailer.createTransport({
+    service: 'gmail',
     auth: {
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASS
     }
-  }));
+  });
   let mailOptions = {
     from: process.env.MAIL_USER,
     to: email,

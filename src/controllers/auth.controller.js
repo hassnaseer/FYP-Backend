@@ -24,13 +24,6 @@ exports.register = async (req, res) => {
       message: "User is already Exist",
     });
   }
-  if (password == undefined) {
-    password = generator.generate({
-      length: 10,
-      numbers: true,
-    });
-    sendMail = true;
-  }
   try {
     const user = await User.create({
       fullName,
@@ -38,13 +31,8 @@ exports.register = async (req, res) => {
       email,
       password: bcrypt.hashSync(password, 8),
     });
-    if (sendMail == true) {
-      user.isPasswordAuto = true;
-      user.save();
-      sendEmail(email, "One Time Password", password);
-    }
+      sendEmail(email, "SuccessFully Registered", password);
    
-    // var token = user.getJWTToken();
     res.status(200).send({
       status: "success",
       data: user,
