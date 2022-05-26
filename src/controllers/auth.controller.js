@@ -92,7 +92,7 @@ exports.forgotPassword = async (req, res, next) => {
     return next(new APIError("Email not found", 400));
 
   const token = await user.generateForgotPasswordToken(user, 32);
-  const frontendUrl = `${process.env.APP_URL}resetPassword?token=${token}`;
+  const frontendUrl = `${process.env.WEB_URL}resetPassword?token=${token}`;
 
   await sendForgotPasswordEmail(user.email, subject, frontendUrl);
 
