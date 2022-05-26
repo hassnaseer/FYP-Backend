@@ -104,7 +104,7 @@ exports.forgotPassword = async (req, res, next) => {
   );
   res.status(status.CREATED).json({
     status: "Success",
-    message:"Please check your Gmail",
+    message:"Reset Password Link has been sent.",
     reset_token: token,
   });
 };
