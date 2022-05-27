@@ -56,7 +56,7 @@ exports.login = async (req, res) => {
     if (!user) {
       return res.status(400).send({
         accessToken: null,
-        message: "User does'nt exists",
+        message: "User doesn't exists",
       });
     }
     var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
