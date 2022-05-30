@@ -184,22 +184,31 @@ exports.findPlans = async (req, res) => {
 
 exports.stripePayment = async (req, res) => {
   try {
-    const customer = await stripe.customers.create({
-      description:
-        "My First Test Customer (created for API docs at https://www.stripe.com/docs/api)",
+    console.log(req.body.email, "here is email")
+    if(req.body.email === null){
+      res.status(400).send({
+        message:"Please Login for purchase this package!"
+      });
+    }else{
+      
+    const customer =  await stripe.customers.create({
       email: req.body.email,
-      customer: req.body.customer_Id,
     });
-    const subscription = await stripe.x.create({
-      customer: req.body.stripePaymentId,
-      items: [{ price: req.body.price }],
+    console.log(customer.id, "here is id")
+    const subscriptions = await stripe.subscriptions.create({
+      customer: customer.id,
+      items: [
+        {price: req.body.priceId},
+      ],
+      payment_behavior: 'default_incomplete',
+      expand: ['latest_invoice.payment_intent'],
     });
-
     res.status(200).send({
-      subscription,
+      subscriptions,
       status: "Success",
-      // message:"Successfully Paid"
+      message:"Successfully Paid, Now you can Play game by clicking on start Training."
     });
+  } 
   } catch (err) {
     res.status(500).send({ message: err.message });
   }

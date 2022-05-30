@@ -47,7 +47,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const user = await User.findOne({
-      attributes: ["userName", "password"],
+      attributes: ["userName", "password", "email"],
       where: {
         userName: req.body.userName,
       },
