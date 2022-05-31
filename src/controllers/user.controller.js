@@ -190,11 +190,9 @@ exports.stripePayment = async (req, res) => {
         message:"Please Login for purchase this package!"
       });
     }else{
-      
     const customer =  await stripe.customers.create({
       email: req.body.email,
     });
-    console.log(customer.id, "here is id")
     const subscriptions = await stripe.subscriptions.create({
       customer: customer.id,
       items: [

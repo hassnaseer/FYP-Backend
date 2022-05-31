@@ -55,6 +55,9 @@ User.init(
     password: {
       type: DataTypes.STRING,
     },
+    admin: {
+      type: DataTypes.STRING,
+    },
   },
   {
     sequelize,

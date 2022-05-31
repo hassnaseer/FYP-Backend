@@ -47,7 +47,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const user = await User.findOne({
-      attributes: ["userName", "password", "email"],
+      attributes: ["userName", "password", "email", "admin"],
       where: {
         userName: req.body.userName,
       },
@@ -170,4 +170,51 @@ exports.resetPassword = async (req, res, next) => {
     message:"Your Password has been reset Successfully.",
     accessToken,
   });
+};
+
+exports.forgotUsername = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({
+      attributes: ["userName"],
+      where: {
+        email: email,
+      },
+    });
+
+    await sendForgotPasswordEmail(email, "Your Username", JSON.stringify(user));
+
+    if (!user) {
+      return res.status(400).send({
+        accessToken: null,
+        message: "User doesn't exists",
+      });
+    }
+    res.status(status.OK).json({
+      status: "Success",
+      user: user,
+      message:"Username has been sent to your email address. Please check spam as well.",
+    });
+  } catch(err){
+    res.status(500).send({ message: err.message });
+  }
+};
+
+
+exports.userList = async (req, res, next) => {
+  try {
+    const user = await User.findAll();
+    if (!user) {
+      return res.status(400).send({
+        accessToken: null,
+        message: "User doesn't exists",
+      });
+    }
+    res.status(status.OK).json({
+      status: "Success",
+      user: user,
+    });
+  } catch(err){
+    res.status(500).send({ message: err.message });
+  }
 };
