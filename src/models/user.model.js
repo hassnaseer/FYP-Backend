@@ -58,6 +58,9 @@ User.init(
     admin: {
       type: DataTypes.STRING,
     },
+    stripeId: {
+      type: DataTypes.STRING,
+    },
   },
   {
     sequelize,

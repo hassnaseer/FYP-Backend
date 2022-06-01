@@ -183,8 +183,8 @@ exports.findPlans = async (req, res) => {
 };
 
 exports.stripePayment = async (req, res) => {
+  let{userId,id} = req.body;
   try {
-    console.log(req.body.email, "here is email")
     if(req.body.email === null){
       res.status(400).send({
         message:"Please Login for purchase this package!"
@@ -201,6 +201,12 @@ exports.stripePayment = async (req, res) => {
       payment_behavior: 'default_incomplete',
       expand: ['latest_invoice.payment_intent'],
     });
+    await User.update(
+      { stripeId: id },
+      {
+        where: { id: userId},
+      }
+    );
     res.status(200).send({
       subscriptions,
       status: "Success",
@@ -208,6 +214,39 @@ exports.stripePayment = async (req, res) => {
     });
   } 
   } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
+exports.stripeUpdate = async (req, res) => {
+  try {
+    const subscription = await stripe.subscriptions.retrieve(
+      // req.body.subId
+      "sub_1L5mLgLo72iSiOk1BG7gUCfE",);
+      console.log(subscription, "here is subscription")
+    const sub = await stripe.subscriptions.update(
+      // req.body.subId
+      "sub_1L5mLgLo72iSiOk1BG7gUCfE", {
+      items: [
+        {
+          id: subscription.items.data[0].id,
+          price: subscription.items.data[0].amount,
+        },
+      ],
+      proration_behavior: "create_prorations",
+    });
+    await User.update(
+      { stripeId: req.body.stripeId },
+      {
+        where: { stripeId: req.body.stripeId },
+      }
+    );
+    res.status(200).send({
+      sub,
+      status: "Success",
+      message:"Successfully Paid, Now you can Play game by clicking on start Training."
+    });
+  }catch (err) {
     res.status(500).send({ message: err.message });
   }
 };
