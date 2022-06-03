@@ -61,6 +61,12 @@ User.init(
     stripeId: {
       type: DataTypes.STRING,
     },
+    googleId: {
+      type: DataTypes.STRING,
+    },
+    facebookId: {
+      type: DataTypes.STRING,
+    },
   },
   {
     sequelize,

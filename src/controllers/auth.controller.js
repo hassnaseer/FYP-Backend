@@ -4,6 +4,7 @@ const { Op } = require("sequelize");
 const { validateEmail } = require("../utils/validateEmail");
 const { sendEmail, sendForgotPasswordEmail } = require("../utils/sendEmail");
 const APIError = require("../utils/APIError.js");
+const { OAuth2Client } = require("google-auth-library");
 const sequelize = require("sequelize");
 const status = require("http-status");
 const { User, ForgotPasswordToken } = require("../models/index");
@@ -217,4 +218,70 @@ exports.userList = async (req, res, next) => {
   } catch(err){
     res.status(500).send({ message: err.message });
   }
+};
+
+exports.googleLogin = async (req, res, next) => {
+  const { idToken } = req.body;
+
+  const client = new OAuth2Client(process.env.IOS_GOOGLE_CLIENT_ID);
+
+  const ticket = await client.verifyIdToken({
+    idToken: idToken,
+    audience: process.env.IOS_GOOGLE_CLIENT_ID,
+  });
+
+  const { sub, email, name } = ticket.getPayload();
+
+  let user = await User.findOne({ where: { googleId: sub } });
+  if (!user) {
+    user = await User.findOne({ where: { email } });
+    if (user) {
+      await user.update({ googleId: sub, userName: name });
+    } else {
+      user = await User.create({
+        googleId: sub,
+        email: email,
+        userName: name,
+      });
+    }
+  } else {
+    await user.update({ userName: name });
+  }
+
+  res.status(status.OK).json({
+    status: "Success",
+    token: user.userName ? user.getJWTToken() : null,
+    registered: user.userName ? true : false,
+  });
+};
+
+exports.facebookLogin = async (req, res, next) => {
+  let { facebookId, userName, email } = req.body;
+
+  let user = await User.findOne({ where: { facebookId } });
+  if (!user) {
+    if (email)
+ user = await User.findOne({ where: { email } });
+
+    if (user) {
+      await user.update({ facebookId, userName });
+    } else {
+      user = await User.create({
+        facebookId,
+        email: email,
+        userName: userName,
+      });
+    }
+  } else {
+    await user.update({ userName: userName });
+  }
+
+  res.status(status.OK).json({
+    status: messages.SUCCESS,
+    token: user.userName ? user.getJWTToken() : null,
+    registered: user.userName ? true : false,
+    data: {
+      user: await userDetail(user.id),
+    },
+  });
 };

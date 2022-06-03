@@ -185,7 +185,7 @@ exports.findPlans = async (req, res) => {
 exports.stripePayment = async (req, res) => {
   let{userId,id} = req.body;
   try {
-    if(req.body.email === null){
+    if(req.body.email === null || userId === undefined){
       res.status(400).send({
         message:"Please Login for purchase this package!"
       });
@@ -219,14 +219,16 @@ exports.stripePayment = async (req, res) => {
 };
 
 exports.stripeUpdate = async (req, res) => {
+  let {subId} = req.body;
   try {
     const subscription = await stripe.subscriptions.retrieve(
-      // req.body.subId
-      "sub_1L5mLgLo72iSiOk1BG7gUCfE",);
-      console.log(subscription, "here is subscription")
+      subId
+      // "sub_1L5mLgLo72iSiOk1BG7gUCfE",
+      );
     const sub = await stripe.subscriptions.update(
-      // req.body.subId
-      "sub_1L5mLgLo72iSiOk1BG7gUCfE", {
+      subId,
+      // "sub_1L5mLgLo72iSiOk1BG7gUCfE",
+       {
       items: [
         {
           id: subscription.items.data[0].id,

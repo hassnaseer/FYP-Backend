@@ -25,6 +25,9 @@ Plan.init(
             type: DataTypes.STRING,
             allowNull: false,
         },
+        perMonth: {
+            type: DataTypes.STRING,
+        },
     },
     {
         sequelize,
