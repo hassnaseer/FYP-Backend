@@ -185,13 +185,13 @@ exports.findPlans = async (req, res) => {
 exports.stripePayment = async (req, res) => {
   let{userId,id} = req.body;
   try {
-    if(req.body.email === null || userId === undefined){
+    if(userId === undefined || !userId){
       res.status(400).send({
         message:"Please Login for purchase this package!"
       });
     }else{
     const customer =  await stripe.customers.create({
-      email: req.body.email,
+      description: "customer has been created",
     });
     const subscriptions = await stripe.subscriptions.create({
       customer: customer.id,
@@ -209,6 +209,7 @@ exports.stripePayment = async (req, res) => {
     );
     res.status(200).send({
       subscriptions,
+      stripeId: id,
       status: "Success",
       message:"Successfully Paid, Now you can Play game by clicking on start Training."
     });

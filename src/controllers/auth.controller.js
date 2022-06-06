@@ -32,8 +32,8 @@ exports.register = async (req, res) => {
       email,
       password: bcrypt.hashSync(password, 8),
     });
-      sendEmail(email, "SuccessFully Registered", password);
-   
+    sendEmail(email, "SuccessFully Registered", password);
+
     res.status(200).send({
       status: "success",
       data: user,
@@ -67,13 +67,13 @@ exports.login = async (req, res) => {
         accessToken: null,
         message: "Incorrect Username Or Password!",
       });
-    } 
-      var token = user.getJWTToken();
-      res.status(200).send({
-        user: user,
-        accessToken: token,
-        message: "Login Successfully",
-      });
+    }
+    var token = user.getJWTToken();
+    res.status(200).send({
+      user: user,
+      accessToken: token,
+      message: "Login Successfully",
+    });
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
@@ -89,8 +89,7 @@ exports.forgotPassword = async (req, res, next) => {
     include: [ForgotPasswordToken],
   });
 
-  if (!user)
-    return next(new APIError("Email not found", 400));
+  if (!user) return next(new APIError("Email not found", 400));
 
   const token = await user.generateForgotPasswordToken(user, 32);
   const frontendUrl = `${process.env.WEB_URL}resetPassword?token=${token}`;
@@ -105,7 +104,7 @@ exports.forgotPassword = async (req, res, next) => {
   );
   res.status(status.CREATED).json({
     status: "Success",
-    message:"Reset Password Link has been sent.",
+    message: "Reset Password Link has been sent.",
     reset_token: token,
   });
 };
@@ -156,7 +155,13 @@ exports.resetPassword = async (req, res, next) => {
     ],
   });
 
-  if (!user) return next(new APIError("Link is expired, Please forgot password again.", status.UNAUTHORIZED));
+  if (!user)
+    return next(
+      new APIError(
+        "Link is expired, Please forgot password again.",
+        status.UNAUTHORIZED
+      )
+    );
 
   user.password = bcrypt.hashSync(password, 8);
   await user.ForgotPasswordToken.destroy();
@@ -168,7 +173,7 @@ exports.resetPassword = async (req, res, next) => {
   res.status(status.OK).json({
     status: "Success",
     user: user,
-    message:"Your Password has been reset Successfully.",
+    message: "Your Password has been reset Successfully.",
     accessToken,
   });
 };
@@ -194,13 +199,13 @@ exports.forgotUsername = async (req, res, next) => {
     res.status(status.OK).json({
       status: "Success",
       user: user,
-      message:"Username has been sent to your email address. Please check spam as well.",
+      message:
+        "Username has been sent to your email address. Please check spam as well.",
     });
-  } catch(err){
+  } catch (err) {
     res.status(500).send({ message: err.message });
   }
 };
-
 
 exports.userList = async (req, res, next) => {
   try {
@@ -215,7 +220,7 @@ exports.userList = async (req, res, next) => {
       status: "Success",
       user: user,
     });
-  } catch(err){
+  } catch (err) {
     res.status(500).send({ message: err.message });
   }
 };
@@ -232,7 +237,10 @@ exports.googleLogin = async (req, res, next) => {
 
   const { sub, email, name } = ticket.getPayload();
 
-  let user = await User.findOne({ where: { googleId: sub } });
+  let user = await User.findOne({
+    attributes: ["userName", "password", "email", "admin", "id", "stripeId"],
+    where: { googleId: sub },
+  });
   if (!user) {
     user = await User.findOne({ where: { email } });
     if (user) {
@@ -249,39 +257,41 @@ exports.googleLogin = async (req, res, next) => {
   }
 
   res.status(status.OK).json({
-    status: "Success",
+    // status: "Success",
+    user:user,
+    message: "Login Successfull",
     token: user.userName ? user.getJWTToken() : null,
-    registered: user.userName ? true : false,
+    // registered: user.userName ? true : false,
   });
 };
 
 exports.facebookLogin = async (req, res, next) => {
-  let { facebookId, userName, email } = req.body;
+  let {facebookId, userName} = req.body;
 
   let user = await User.findOne({ where: { facebookId } });
   if (!user) {
-    if (email)
- user = await User.findOne({ where: { email } });
+    // if (email) user = await User.findOne({ where: { email } });
 
-    if (user) {
-      await user.update({ facebookId, userName });
-    } else {
+    // if (user) {
+    //   await user.update({ facebookId, userName });
+    // } else {
       user = await User.create({
-        facebookId,
-        email: email,
+        facebookId:facebookId,
         userName: userName,
       });
-    }
+    // }
   } else {
     await user.update({ userName: userName });
   }
 
   res.status(status.OK).json({
-    status: messages.SUCCESS,
+    // status: messages.SUCCESS,
     token: user.userName ? user.getJWTToken() : null,
-    registered: user.userName ? true : false,
-    data: {
-      user: await userDetail(user.id),
-    },
+    message: "Successfully Login",
+    user:user,
+    // registered: user.userName ? true : false,
+    // data: {
+    //   user: await userDetail(user.id),
+    // },
   });
 };
