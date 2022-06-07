@@ -211,7 +211,7 @@ exports.stripePayment = async (req, res) => {
       subscriptions,
       stripeId: id,
       status: "Success",
-      message:"Successfully Paid, Now you can Play game by clicking on start Training."
+      message:"Purchased successfully, Now you can Play game by clicking on start Training."
     });
   } 
   } catch (err) {

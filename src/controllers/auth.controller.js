@@ -224,7 +224,6 @@ exports.userList = async (req, res, next) => {
     res.status(500).send({ message: err.message });
   }
 };
-
 exports.googleLogin = async (req, res, next) => {
   const { idToken } = req.body;
 
