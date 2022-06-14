@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false, limit: "500mb" }));
 app.use("/test", express.static("test"));
-app.use("/build", express.static("build"));
+app.use("/static", express.static("static"));
 
 
 const connectWithDB = async () => {
