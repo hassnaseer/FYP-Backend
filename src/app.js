@@ -9,9 +9,11 @@ var app = express();
 app.use(express.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false, limit: "500mb" }));
-app.use("/test", express.static("test"));
-app.use("/build", express.static("build"));
-
+// app.use("/test", express.static("test"));
+// app.use("/build", express.static('/build/index.html'));
+// app.get("/view", (req, res) => {
+//   res.render('build');
+// });
 
 const connectWithDB = async () => {
   try {

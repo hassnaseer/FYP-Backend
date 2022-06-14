@@ -25,7 +25,10 @@ userRouter.route("/upgradeStripe").post(Model.stripeUpdate);
 //contact
 userRouter.route("/contact-form").post(Model.contactRequest);
 
-
+userRouter.get('/build',function(req,res){
+    console.log("here")
+    res.render('/build/index.html');
+  });
 
 
 
