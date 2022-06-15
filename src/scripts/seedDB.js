@@ -1,10 +1,9 @@
-const { User } = require('../models/index');
+const Plan = require('../models/plansModel');
 const bcrypt = require("bcryptjs");
 const createPackagePlan = async () => {
-  const adminUser = 
+  const createPackagePlan = 
   [
     {
-    id: 1,
     stripePlanId: "price_1L58H7Lo72iSiOk1LS3S1iOD",
     price: 0,
     trialDays: 7,
@@ -13,7 +12,6 @@ const createPackagePlan = async () => {
     perMonth: 0,
   },
   {
-    id: 2,
     stripePlanId: "price_1L1nCwLo72iSiOk1Ur6sbaW9",
     price: 14.99,
     trialDays: 0,
@@ -22,7 +20,6 @@ const createPackagePlan = async () => {
     perMonth: 14.99,
   },
   {
-    id: 3,
     stripePlanId: "price_1L1nCwLo72iSiOk1Qe40K5sU",
     price: 89.94,
     trialDays: 0,
@@ -31,7 +28,6 @@ const createPackagePlan = async () => {
     perMonth: 14.99,
   },
   {
-    id: 4,
     stripePlanId: "price_1L1nCwLo72iSiOk1OK7p4jMT",
     price: 178.8,
     trialDays: 0,
@@ -41,8 +37,8 @@ const createPackagePlan = async () => {
   },
 ]
   // await User.create(adminUser);
-  if(!await User.count() > 0)
-  await User.bulkCreate(adminUser);
+  if(!await Plan.count() > 0)
+  await Plan.bulkCreate(createPackagePlan);
 }
 
 
