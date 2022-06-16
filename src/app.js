@@ -7,7 +7,6 @@ const globalError = require('./middlewares/globalError')
 var app = express();
 
 app.use(express.json());
-app.use(express.json());
 app.use(express.urlencoded({ extended: false, limit: "500mb" }));
 // app.use("/test", express.static("test"));
 // app.use("/build", express.static('/build/index.html'));
@@ -31,7 +30,7 @@ app.use(cors({
   origin: "*"
 }));
 
-app.get("/", (req, res) => {
+app.get("/test", (req, res) => {
   res.json({ message: "Welcome to the beginnings of nothingness." });
 });
 
