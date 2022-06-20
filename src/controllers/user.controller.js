@@ -166,7 +166,6 @@ exports.deleteUser = async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 };
-
 exports.findPlans = async (req, res) => {
   try {
     const response = await Plan.findAll(
