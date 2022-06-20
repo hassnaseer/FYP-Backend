@@ -170,7 +170,7 @@ exports.deleteUser = async (req, res) => {
 exports.findPlans = async (req, res) => {
   try {
     const response = await Plan.findAll(
-      // { order: [["id", "ASCE"]] }
+      { order: [["id", "ASC"]] }
       );
     res.status(200).send({
       response,
