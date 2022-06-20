@@ -27,7 +27,7 @@ exports.index = async (req, res) => {
       ],
       offset: (req.query.page - 1) * 5,
       limit: 5,
-      order: [["id", "DESC"]],
+      order: [["id","DESC"]],
       where: {
         role: 1,
       },
@@ -169,7 +169,7 @@ exports.deleteUser = async (req, res) => {
 exports.findPlans = async (req, res) => {
   try {
     const response = await Plan.findAll(
-      { order: [["id", "ASC"]] }
+      { order: [["id","ASC"]] }
       );
     res.status(200).send({
       response,
