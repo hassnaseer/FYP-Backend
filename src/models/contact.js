@@ -14,7 +14,7 @@ Contact.init(
     email: {
       type: DataTypes.STRING,
     },
-    category: {
+    name: {
       type: DataTypes.STRING,
     },
   },
