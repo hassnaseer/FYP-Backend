@@ -16,13 +16,13 @@ exports.sendEmail = (email, subject, password) => {
       refreshToken: process.env.OAUTH_REFRESH_TOKEN
     }
   });
-
   let mailOptions = {
     from: process.env.MAIL_USER,
     to: email,
     subject: subject,
     // html: prepareOtpTemplate(password)
   };
+  console.log(mailOptions, "=================")
 
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
