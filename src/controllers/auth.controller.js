@@ -1,4 +1,6 @@
 const bcrypt = require("bcryptjs");
+const { Sequelize } = require("sequelize")
+require("dotenv").config()
 const generator = require("generate-password");
 const { Op } = require("sequelize");
 const { validateEmail } = require("../utils/validateEmail");
@@ -46,7 +48,6 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  console.log(req.body, "here is vody")
   try {
     const user = await User.findOne({
       attributes: ["userName", "password", "email", "admin", "id", "stripeId"],
@@ -54,7 +55,8 @@ exports.login = async (req, res) => {
         email: req.body.email,
       },
     });
-
+    
+    console.log(user, "here is vody")
     if (!user) {
       return res.status(400).send({
         accessToken: null,
@@ -76,6 +78,7 @@ exports.login = async (req, res) => {
       message: "Login Successfully",
     });
   } catch (error) {
+    console.log(error)
     res.status(500).send({ message: error.message });
   }
 };

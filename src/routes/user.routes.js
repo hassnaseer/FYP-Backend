@@ -17,9 +17,9 @@ userRouter.route("/:id").get(Model.getSingle);
 
 
 //posts request here
-userRouter.route("/update/:id").post(Model.update);
+userRouter.route("/update/:id").put(Model.update);
 //stripe
-userRouter.route("/charges").post(Model.stripePayment);
+userRouter.route("/charges").post(Model.stripePayment); 
 userRouter.route("/upgradeStripe").post(Model.stripeUpdate);
 
 //contact
