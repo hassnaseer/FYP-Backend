@@ -6,7 +6,7 @@ class Game extends Model {}
 Game.init(
     {
     Amount: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
     },
     TotalGames: {
         type: DataTypes.STRING,
@@ -19,7 +19,6 @@ Game.init(
     },
     Rank: {
         type: DataTypes.STRING,
-        defaultValue: 0,
       }, 
     GameType: {
         type: DataTypes.INTEGER,

@@ -7,8 +7,6 @@ const User = require("../models/user.model");
 const APIError = require("../utils/APIError");
 
 exports.gameData = async (req, res) => {
-  console.log(req.body, "===========")
-   
     let {
         Amount,
         TotalGames,
@@ -105,12 +103,6 @@ exports.wingamesData = async (req, res) => {
 //         });
 //     }
 // };
-
-
-
-
-
-
 
 exports.BigBlindsData = async (req, res) => {
   try {
@@ -404,12 +396,11 @@ exports.oneDayData = async (req, res) => {
   exports.getAll = async (req, res) => {
     try {
       const Data = await Game.findAndCountAll({
-    
+          
         });
         const allsum = Data.rows.reduce((accumulator, object) => {
             return accumulator + object.Amount;
           }, 0)
-          console.log(allsum)
           const Data1 = await Game.findAndCountAll({
             where: {
               [Op.and]: [
@@ -422,7 +413,6 @@ exports.oneDayData = async (req, res) => {
           const sumBWT = Data1.rows.reduce((accumulator, object) => {
               return accumulator + object.Amount;
             }, 0)
-            console.log(sumBWT)
 
         res.status(200).send({
           status: "data  ",
