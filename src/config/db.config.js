@@ -2,30 +2,30 @@ const { Sequelize } = require("sequelize")
 
 require("dotenv").config();
 
-const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
+const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME,DATABASE_URL } = process.env;
 
 // // local server connections
 // // line no 4 ma add krna ha live server k liya 'APP_URL: DATABASE_URL'
 
-const sequelize = new Sequelize(DB_NAME,DB_USER,DB_PASSWORD,{
-    dialect: 'postgres',
-    host:DB_HOST,
-    port:DB_PORT
-}
-);
+// const sequelize = new Sequelize(DB_NAME,DB_USER,DB_PASSWORD,{
+//     dialect: 'postgres',
+//     host:DB_HOST,
+//     port:DB_PORT
+// }
+// );
 
 // // live server connections
 
-// // const sequelize = new Sequelize(DATABASE_URL,{
-// //     dialect: 'postgres',
-// //     protocol: 'postgres',
-// //     dialectOptions: {
-// //         ssl: {
-// //             rejectUnauthorized: false
-// //         }
-// //     }
-// // }
-// // );
+const sequelize = new Sequelize(DATABASE_URL,{
+    dialect: 'postgres',
+    protocol: 'postgres',
+    dialectOptions: {
+        ssl: {
+            rejectUnauthorized: false
+        }
+    }
+}
+);
 module.exports = sequelize;
 
 
