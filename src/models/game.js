@@ -18,6 +18,10 @@ Game.init(
       type: DataTypes.BOOLEAN,
     },
     Rank: {
+        type: DataTypes.STRING,
+        defaultValue: 0,
+      }, 
+    GameType: {
         type: DataTypes.INTEGER,
       },
 

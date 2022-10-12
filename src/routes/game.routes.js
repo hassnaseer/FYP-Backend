@@ -12,6 +12,11 @@ userRouter.route("/oneday").get(Model.oneDayData);
 userRouter.route("/weekly").get(Model.weeklyData);
 userRouter.route("/monthly").get(Model.monthlyData);
 userRouter.route("/getall").get(Model.getAll);
+userRouter.route("/getbygametypeThree").get(Model.getGameByTypeThree);
+userRouter.route("/getbygametypeSix").get(Model.getGameByTypeSix);
+userRouter.route("/getbygametypeNine").get(Model.getGameByTypeNine);
+
+
 
 
 

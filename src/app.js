@@ -1,11 +1,21 @@
 var express = require('express');
 const sequelize = require('./config/db.config');
+var bodyParser = require('body-parser');
+var multer = require('multer');
+var upload = multer();
 const cors = require("cors");
 const { authRoutes, userRoutes, gameRoutes } = require('./routes/index.routes');
 const globalError = require('./middlewares/globalError')
 
 var app = express();
 
+// for parsing multipart/form-data
+app.use(bodyParser.json()); 
+app.use(upload.array()); 
+app.use(express.static('public'));
+
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json())
 app.use(express.json());
 app.use(express.urlencoded({ extended: false, limit: "500mb" }));
 // app.use("/test", express.static("test"));
