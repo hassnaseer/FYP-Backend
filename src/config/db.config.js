@@ -16,16 +16,15 @@ const sequelize = new Sequelize(DB_NAME,DB_USER,DB_PASSWORD,{
 
 // // live server connections
 
-// // const sequelize = new Sequelize(DATABASE_URL,{
-// //     dialect: 'postgres',
-// //     protocol: 'postgres',
-// //     dialectOptions: {
-// //         ssl: {
-// //             rejectUnauthorized: false
-// //         }
-// //     }
-// // }
-// // );
+// const sequelize = new Sequelize(DATABASE_URL,{
+//     dialect: 'postgres',
+//     protocol: 'postgres',
+//     dialectOptions: {
+//         ssl: {
+//             rejectUnauthorized: false
+//         }
+//     }
+
 module.exports = sequelize;
 
 

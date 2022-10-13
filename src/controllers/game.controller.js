@@ -3,12 +3,14 @@ const Sequelize = require("sequelize");
 var moment = require("moment");
 const { Op, sequelize } = require('sequelize');
 const User = require("../models/user.model");
+const jwt = require("jsonwebtoken");
 
 const APIError = require("../utils/APIError");
 
 exports.gameData = async (req, res) => {
   console.log(req.body, "===========")
-   
+  
+  
     let {
         Amount,
         TotalGames,
@@ -16,7 +18,7 @@ exports.gameData = async (req, res) => {
         IsWin,
         Rank,
         GameType,
-        userId,
+    
     } = req.body;
 
     try {
@@ -27,7 +29,6 @@ exports.gameData = async (req, res) => {
             IsWin,
             Rank,
             GameType,
-            userId,
         }
 
         );
@@ -47,6 +48,9 @@ exports.gameData = async (req, res) => {
 exports.getgameData = async (req, res) => {
     try {
         const Data = await Game.findAll({
+          where: {
+            userId: req.user.id,
+          }
 
         });
 
@@ -402,10 +406,12 @@ exports.oneDayData = async (req, res) => {
   // };
 
   exports.getAll = async (req, res) => {
+    
     try {
       const Data = await Game.findAndCountAll({
     
         });
+        
         const allsum = Data.rows.reduce((accumulator, object) => {
             return accumulator + object.Amount;
           }, 0)
