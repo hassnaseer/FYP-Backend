@@ -3,6 +3,8 @@ const sequelize = require('./config/db.config');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var upload = multer();
+const passport = require("passport")
+const {getJwtStrategy} = require("./config/passport")
 const cors = require("cors");
 const { authRoutes, userRoutes, gameRoutes } = require('./routes/index.routes');
 const globalError = require('./middlewares/globalError')
@@ -48,8 +50,7 @@ app.get("/test", (req, res) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/game', gameRoutes);
-
-// passport.use(getJwtStrategy())
+passport.use(getJwtStrategy())
 app.use(globalError);
 
 

@@ -8,9 +8,9 @@ const jwt = require("jsonwebtoken");
 const APIError = require("../utils/APIError");
 
 exports.gameData = async (req, res) => {
-  console.log(req.body, "===========")
   
   
+  const userId = req.user.id;
     let {
         Amount,
         TotalGames,
@@ -18,9 +18,9 @@ exports.gameData = async (req, res) => {
         IsWin,
         Rank,
         GameType,
+
     
     } = req.body;
-
     try {
         const game = await Game.create({
             Amount,
@@ -29,10 +29,11 @@ exports.gameData = async (req, res) => {
             IsWin,
             Rank,
             GameType,
+            userId
         }
 
         );
-        console.log(game)
+        
 
         res.status(200).send({
             status: "success",
@@ -46,11 +47,12 @@ exports.gameData = async (req, res) => {
 };
 
 exports.getgameData = async (req, res) => {
+  const {userId} = req.query;
     try {
         const Data = await Game.findAll({
           where: {
-            userId: req.user.id,
-          }
+            userId: userId,
+          },
 
         });
 
@@ -66,12 +68,14 @@ exports.getgameData = async (req, res) => {
 };
 
 exports.wingamesData = async (req, res) => {
+  const {userId} = req.query;
     try {
         const Data = await Game.findAll({
 
             where: {
                 IsWin: false,
                 GameType: 3,
+                userId: userId,
             }
 
         });
@@ -88,50 +92,25 @@ exports.wingamesData = async (req, res) => {
 };
 
 
-// exports.BigBlindsData = async (req, res) => {
-//     try {
-//         const Data = await Game.findAll({
-
-//             where: {
-//                 BigBlind: true,
-//                 IsWin: true
-//             }
-            
-//         });
-
-//         res.status(200).send({
-//             status: "data of games where big blind is true ",
-//             data: Data,
-//         });
-//     } catch (error) {
-//         res.status(500).send({
-//             message: error.message,
-//         });
-//     }
-// };
-
-
-
-
-
-
 
 exports.BigBlindsData = async (req, res) => {
+  const {userId} = req.query;
   try {
     const Data = await Game.findAll({
       where: {
-        [Op.and]: [{ IsWin: true }, { BigBlind: true }],
+        [Op.and]: [{ IsWin: true }, { BigBlind: true }, {userId:req.user.id}],
       },
     });
     const sum = Data.rows.reduce((accumulator, object) => {
       return accumulator + object.Amount;
     }, 0)
-    console.log(sum)
+   
    
 
     const Data1 = await Game.findAll({
       where: {
-        [Op.and]: [{ IsWin: true }, { BigBlind: false }],
+        [Op.and]: [{ IsWin: true }, { BigBlind: false },
+          {userId:userId}],
       },
     });
     const sum1 = Data1.rows.reduce((accumulator, object) => {
@@ -153,12 +132,16 @@ exports.BigBlindsData = async (req, res) => {
 
 
 exports.oneDayData = async (req, res) => {
+  const {userId} = req.query;
   try {
     const Data = await Game.findAndCountAll({
         where: {
+          userId: userId,
+
           [Op.and]: [
               {BigBlind:true},
-              { IsWin: true }
+              { IsWin: true },
+              
             ],
             
           createdAt: {
@@ -169,13 +152,14 @@ exports.oneDayData = async (req, res) => {
       const sum = Data.rows.reduce((accumulator, object) => {
           return accumulator + object.Amount;
         }, 0)
-        console.log(sum)
+  
 
         const Data1 = await Game.findAndCountAll({
           where: {
+            userId: userId,
             [Op.and]: [
               {BigBlind:false},
-                { IsWin: true }
+              { IsWin: true },
               ],
               
             createdAt: {
@@ -186,7 +170,7 @@ exports.oneDayData = async (req, res) => {
         const sum1 = Data1.rows.reduce((accumulator, object) => {
             return accumulator + object.Amount;
           }, 0)
-          console.log(sum1)
+        
 
 
       res.status(200).send({
@@ -203,12 +187,15 @@ exports.oneDayData = async (req, res) => {
 };
 
   exports.weeklyData = async (req, res) => {
+    const {userId} = req.query;
     try {
       const Data = await Game.findAndCountAll({
           where: {
+            userId: userId,
             [Op.and]: [
                 {BigBlind:true},
-                { IsWin: true }
+                { IsWin: true },
+                
               ],
               
               createdAt: {
@@ -219,13 +206,13 @@ exports.oneDayData = async (req, res) => {
         const sum = Data.rows.reduce((accumulator, object) => {
             return accumulator + object.Amount;
           }, 0)
-          console.log(sum)
+        
 
           const Data1 = await Game.findAndCountAll({
             where: {
               [Op.and]: [
                 {BigBlind:false},
-                  { IsWin: true }
+                  { IsWin: true },
                 ],
                 
                 createdAt: {
@@ -236,7 +223,7 @@ exports.oneDayData = async (req, res) => {
           const sum1 = Data1.rows.reduce((accumulator, object) => {
               return accumulator + object.Amount;
             }, 0)
-            console.log(sum1)
+          
   
 
         res.status(200).send({
@@ -254,12 +241,14 @@ exports.oneDayData = async (req, res) => {
 
  
   exports.monthlyData = async (req, res) => {
+    const {userId} = req.query;
     try {
       const Data = await Game.findAndCountAll({
           where: {
+            userId: userId,
             [Op.and]: [
                 {BigBlind:true},
-                { IsWin: true }
+                { IsWin: true },
               ],
               
               createdAt: {
@@ -270,13 +259,13 @@ exports.oneDayData = async (req, res) => {
         const sum = Data.rows.reduce((accumulator, object) => {
             return accumulator + object.Amount;
           }, 0)
-          console.log(sum)
+          
 
           const Data1 = await Game.findAndCountAll({
             where: {
               [Op.and]: [
                 {BigBlind:false},
-                  { IsWin: true }
+                { IsWin: true },
                 ],
                 createdAt: {
                   [Op.gte]: moment().subtract(30, 'days').toDate(),
@@ -287,7 +276,7 @@ exports.oneDayData = async (req, res) => {
           const sum1 = Data1.rows.reduce((accumulator, object) => {
               return accumulator + object.Amount;
             }, 0)
-            console.log(sum1)
+           
   
 
         res.status(200).send({
@@ -303,6 +292,7 @@ exports.oneDayData = async (req, res) => {
     }
   };
   exports.getGameByTypeThree = async (req, res) => {
+    const {userId} = req.query;
     try {
       const Data = await Game.findAll({
         include: [
@@ -314,6 +304,7 @@ exports.oneDayData = async (req, res) => {
   
         where: {
           GameType: 3,
+          userId:userId,
         },
         order: [["Amount", "DESC"]],
         limit: 5,
@@ -330,6 +321,7 @@ exports.oneDayData = async (req, res) => {
     }
   };
   exports.getGameByTypeSix = async (req, res) => {
+    const {userId} = req.query;
     try {
       const Data = await Game.findAll({
         include: [
@@ -340,6 +332,7 @@ exports.oneDayData = async (req, res) => {
         ],
         where: {
           GameType: 6,
+          userId:userId,
         },
         order: [["Amount", "DESC"]],
         limit: 5,
@@ -356,6 +349,7 @@ exports.oneDayData = async (req, res) => {
     }
   };
   exports.getGameByTypeNine = async (req, res) => {
+    const {userId} = req.query;
     try {
       const Data = await Game.findAll({
         include: [
@@ -366,6 +360,7 @@ exports.oneDayData = async (req, res) => {
         ],
         where: {
           GameType: 9,
+          userId: userId,
         },
         order: [["Amount", "DESC"]],
         limit: 5,
@@ -384,38 +379,21 @@ exports.oneDayData = async (req, res) => {
 
 
 
-  // exports.getAll = async (req, res) => {
-  //   try {
-  //     const Data = await Game.findAndCountAll({
-    
-  //       });
-  //       const sum = Data.rows.reduce((accumulator, object) => {
-  //           return accumulator + object.Amount;
-  //         }, 0)
-  //         console.log(sum)
-
-  //       res.status(200).send({
-  //         status: "data  ",
-  //         data:Data, sum
-  //       });
-  //   } catch (error) {
-  //     res.status(500).send({
-  //       message: error.message,
-  //     });
-  //   }
-  // };
-
   exports.getAll = async (req, res) => {
-    
+    console.log();
+    const {userId} = req.query;
+
+    console.log(userId);
     try {
       const Data = await Game.findAndCountAll({
-    
-        });
+        where: {
+          userId: userId
+        }  
+      });
         
         const allsum = Data.rows.reduce((accumulator, object) => {
             return accumulator + object.Amount;
           }, 0)
-          console.log(allsum)
           const Data1 = await Game.findAndCountAll({
             where: {
               [Op.and]: [
@@ -428,7 +406,6 @@ exports.oneDayData = async (req, res) => {
           const sumBWT = Data1.rows.reduce((accumulator, object) => {
               return accumulator + object.Amount;
             }, 0)
-            console.log(sumBWT)
 
         res.status(200).send({
           status: "data  ",

@@ -4,7 +4,7 @@ const Model = require('../controllers/game.controller')
 const userRouter = express.Router();
 
 
-userRouter.route("/gamedata").post(Model.gameData);
+userRouter.route("/gamedata").post(authJwt, Model.gameData);
 userRouter.route("/getgamedata").get(Model.getgameData);
 userRouter.route("/win-games").get(Model.wingamesData);
 userRouter.route("/big-blind").get(Model.BigBlindsData);
