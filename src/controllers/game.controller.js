@@ -206,6 +206,7 @@ exports.oneDayData = async (req, res) => {
 
           const Data1 = await Game.findAndCountAll({
             where: {
+              userId:userId,
               [Op.and]: [
                 {BigBlind:false},
                   { IsWin: true },
@@ -255,10 +256,9 @@ exports.oneDayData = async (req, res) => {
         const sum = Data.rows.reduce((accumulator, object) => {
             return accumulator + object.Amount;
           }, 0)
-          
-
           const Data1 = await Game.findAndCountAll({
             where: {
+              userId:userId,
               [Op.and]: [
                 {BigBlind:false},
                 { IsWin: true },
@@ -266,15 +266,11 @@ exports.oneDayData = async (req, res) => {
                 createdAt: {
                   [Op.gte]: moment().subtract(30, 'days').toDate(),
                 },
-                
             }
           });
           const sum1 = Data1.rows.reduce((accumulator, object) => {
               return accumulator + object.Amount;
             }, 0)
-           
-  
-
         res.status(200).send({
           status: "data  ",
           data:Data, sum,
