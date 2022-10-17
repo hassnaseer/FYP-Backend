@@ -32,7 +32,6 @@ exports.index = async (req, res) => {
         role: 1,
       },
     };
-
     const users = await User.findAndCountAll(options);
     res.status(200).send({
       status: "success",
@@ -46,35 +45,14 @@ exports.index = async (req, res) => {
   }
 };
 exports.getSingle = async (req, res) => {
+  console.log(req.params.id)
   try {
     const user = await User.findOne({
-      attributes: [
-        "id",
-        "email",
-        "phone",
-        "city",
-        "country",
-        "isActive",
-        "firstName",
-        "lastName",
-        "gender",
-        "age",
-        "dob",
-        [
-          Sequelize.fn(
-            "concat",
-            Sequelize.col("firstName"),
-            " ",
-            Sequelize.col("lastName")
-          ),
-          "name",
-        ],
-      ],
+      attributes: ["userName", "password", "email", "admin", "id", "stripeId"],
       where: {
         id: req.params.id,
       },
     });
-
     res.status(200).send({
       status: "success",
       data: user,
