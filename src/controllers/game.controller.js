@@ -8,9 +8,7 @@ const jwt = require("jsonwebtoken");
 const APIError = require("../utils/APIError");
 
 exports.gameData = async (req, res) => {
-  
-  
-  const userId = req.user.id;
+  const userId = req.body.id;
     let {
         Amount,
         TotalGames,
@@ -18,8 +16,6 @@ exports.gameData = async (req, res) => {
         IsWin,
         Rank,
         GameType,
-
-    
     } = req.body;
     try {
         const game = await Game.create({
@@ -380,10 +376,7 @@ exports.oneDayData = async (req, res) => {
 
 
   exports.getAll = async (req, res) => {
-    console.log();
     const {userId} = req.query;
-
-    console.log(userId);
     try {
       const Data = await Game.findAndCountAll({
         where: {
