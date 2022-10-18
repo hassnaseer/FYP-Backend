@@ -8,7 +8,8 @@ const jwt = require("jsonwebtoken");
 const APIError = require("../utils/APIError");
 
 exports.gameData = async (req, res) => {
-  const userId = req.body.id;
+  const {id} = req.query;
+  let userId = id;
     let {
         Amount,
         TotalGames,
