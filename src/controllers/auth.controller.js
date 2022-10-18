@@ -55,8 +55,6 @@ exports.login = async (req, res) => {
         email: req.body.email,
       },
     });
-    
-    console.log(user, "here is vody")
     if (!user) {
       return res.status(400).send({
         accessToken: null,

@@ -10,27 +10,36 @@ const APIError = require("../utils/APIError");
 exports.gameData = async (req, res) => {
   const {id} = req.query;
   let userId = id;
+
     let {
         Amount,
         BigBlind,
         IsWin,
-        GameType,
+        Rank,
     } = req.body;
     try {
+      let user =await User.findOne({
+        where:{id, id}
+      })
+      if (!user) {
+        return res.status(400).send({
+          accessToken: null,
+          message: "User doesn't exists",
+        });
+      }else{
         const game = await Game.create({
             Amount,
             BigBlind,
             IsWin,
-            GameType,
+            Rank,
             userId
         }
-        );
-        
-
+        )
         res.status(200).send({
             status: "success",
             data: game,
         });
+      };
     } catch (error) {
         res.status(500).send({
             message: error.message,
