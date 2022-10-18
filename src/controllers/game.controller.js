@@ -12,23 +12,18 @@ exports.gameData = async (req, res) => {
   let userId = id;
     let {
         Amount,
-        TotalGames,
         BigBlind,
         IsWin,
-        Rank,
         GameType,
     } = req.body;
     try {
         const game = await Game.create({
             Amount,
-            TotalGames,
             BigBlind,
             IsWin,
-            Rank,
             GameType,
             userId
         }
-
         );
         
 
