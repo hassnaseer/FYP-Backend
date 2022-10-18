@@ -385,6 +385,7 @@ exports.oneDayData = async (req, res) => {
           }, 0)
           const Data1 = await Game.findAndCountAll({
             where: {
+              userId:userId,
               [Op.and]: [
                   {BigBlind:true},
                   { IsWin: true }
