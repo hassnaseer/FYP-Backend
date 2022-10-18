@@ -285,7 +285,6 @@ exports.oneDayData = async (req, res) => {
     }
   };
   exports.getGameByTypeThree = async (req, res) => {
-    const {userId} = req.query;
     try {
       const Data = await Game.findAll({
         include: [
@@ -297,7 +296,6 @@ exports.oneDayData = async (req, res) => {
   
         where: {
           GameType: 3,
-          userId:userId,
         },
         order: [["Amount", "DESC"]],
         limit: 5,
@@ -314,7 +312,6 @@ exports.oneDayData = async (req, res) => {
     }
   };
   exports.getGameByTypeSix = async (req, res) => {
-    const {userId} = req.query;
     try {
       const Data = await Game.findAll({
         include: [
@@ -325,7 +322,6 @@ exports.oneDayData = async (req, res) => {
         ],
         where: {
           GameType: 6,
-          userId:userId,
         },
         order: [["Amount", "DESC"]],
         limit: 5,
@@ -342,7 +338,6 @@ exports.oneDayData = async (req, res) => {
     }
   };
   exports.getGameByTypeNine = async (req, res) => {
-    const {userId} = req.query;
     try {
       const Data = await Game.findAll({
         include: [
@@ -353,7 +348,6 @@ exports.oneDayData = async (req, res) => {
         ],
         where: {
           GameType: 9,
-          userId: userId,
         },
         order: [["Amount", "DESC"]],
         limit: 5,
