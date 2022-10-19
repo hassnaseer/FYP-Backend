@@ -15,6 +15,7 @@ exports.gameData = async (req, res) => {
         Amount,
         BigBlind,
         IsWin,
+        GameType,
         Rank,
     } = req.body;
     try {
@@ -32,6 +33,7 @@ exports.gameData = async (req, res) => {
             BigBlind,
             IsWin,
             Rank,
+            GameType,
             userId
         }
         )
