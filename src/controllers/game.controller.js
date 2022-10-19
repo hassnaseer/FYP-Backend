@@ -10,13 +10,12 @@ const APIError = require("../utils/APIError");
 exports.gameData = async (req, res) => {
   const {id} = req.query;
   let userId = id;
-
+ console.log(req.body)
     let {
         Amount,
         BigBlind,
         IsWin,
         GameType,
-        Rank,
     } = req.body;
     try {
       let user =await User.findOne({
@@ -32,7 +31,6 @@ exports.gameData = async (req, res) => {
             Amount,
             BigBlind,
             IsWin,
-            Rank,
             GameType,
             userId
         }
