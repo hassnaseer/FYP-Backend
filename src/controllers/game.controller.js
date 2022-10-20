@@ -311,9 +311,9 @@ exports.monthlyData = async (req, res) => {
           'GameType','userId',
           [Sequelize.fn('sum', Sequelize.col('Amount')), 'total_amount'],
         ],
-        group: ['GameType', 'userId','userName'],
         order: [[Sequelize.col('total_amount'), 'DESC']],
-        raw: true,
+        group: ['GameType', 'userId','userName',"User.id"],
+        raw:false,
         where: {
               GameType: 3,
             },
@@ -339,12 +339,12 @@ exports.monthlyData = async (req, res) => {
        },
      ],
      attributes: [
-       'GameType','userId',
+       'GameType',
        [Sequelize.fn('sum', Sequelize.col('Amount')), 'total_amount'],
      ],
-     group: ['GameType', 'userId','userName'],
      order: [[Sequelize.col('total_amount'), 'DESC']],
-     raw: true,
+     group: ['GameType', 'userId','userName',"User.id"],
+     raw:false,
      where: {
            GameType: 6,
          },
@@ -401,14 +401,16 @@ exports.monthlyData = async (req, res) => {
        'GameType','userId',
        [Sequelize.fn('sum', Sequelize.col('Amount')), 'total_amount'],
      ],
-     group: ['GameType', 'userId','userName'],
+     group: ['GameType', 'userId','userName',"User.id"],
+     raw:false,
      order: [[Sequelize.col('total_amount'), 'DESC']],
-     raw: true,
      where: {
            GameType: 9,
          },
      limit:5
    });
+   
+   console.log(totalAmount)
       res.status(200).send({
         status: "data of game type 9 ",
         data: totalAmount,
