@@ -1,7 +1,7 @@
 const Game = require("../models/game");
 const Sequelize = require("sequelize");
 var moment = require("moment");
-// const { Op, sequelize } = require('sequelize');
+const { Op, sequelize } = require('sequelize');
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 
