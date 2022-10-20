@@ -1,7 +1,7 @@
 const Game = require("../models/game");
 const Sequelize = require("sequelize");
 var moment = require("moment");
-const { Op, sequelize } = require('sequelize');
+// const { Op, sequelize } = require('sequelize');
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 
@@ -92,8 +92,6 @@ exports.wingamesData = async (req, res) => {
     }
 };
 
-
-
 exports.BigBlindsData = async (req, res) => {
   const {userId} = req.query;
   try {
@@ -130,7 +128,6 @@ exports.BigBlindsData = async (req, res) => {
     });
   }
 };
-
 
 exports.oneDayData = async (req, res) => {
   const {userId} = req.query;
@@ -187,7 +184,7 @@ exports.oneDayData = async (req, res) => {
   }
 };
 
-  exports.weeklyData = async (req, res) => {
+exports.weeklyData = async (req, res) => {
     const {userId} = req.query;
     try {
       const Data = await Game.findAndCountAll({
@@ -241,8 +238,7 @@ exports.oneDayData = async (req, res) => {
     }
   };
 
- 
-  exports.monthlyData = async (req, res) => {
+exports.monthlyData = async (req, res) => {
     const {userId} = req.query;
     try {
       const Data = await Game.findAndCountAll({
@@ -290,24 +286,42 @@ exports.oneDayData = async (req, res) => {
   };
   exports.getGameByTypeThree = async (req, res) => {
     try {
-      const Data = await Game.findAll({
-        include: [
+      // const Data = await Game.findAll({
+      //   include: [
+      //     {
+      //       model: User,
+      //       attributes: ["userName"],
+      //     },
+      //   ],
+  
+      //   where: {
+      //     GameType: 3,
+      //   },
+      //   order: [["Amount", "DESC"]],
+      //   limit: 5,
+      // });
+      const totalAmount = await Game.findAll({
+           include: [
           {
             model: User,
             attributes: ["userName"],
           },
         ],
-  
+        attributes: [
+          'GameType','userId',
+          [Sequelize.fn('sum', Sequelize.col('Amount')), 'total_amount'],
+        ],
+        group: ['GameType', 'userId','userName'],
+        order: [[Sequelize.col('total_amount'), 'DESC']],
+        raw: true,
         where: {
-          GameType: 3,
-        },
-        order: [["Amount", "DESC"]],
-        limit: 5,
+              GameType: 3,
+            },
+        limit:5
       });
-  
       res.status(200).send({
         status: "data of game type 3 ",
-        data: Data,
+        data: totalAmount,
       });
     } catch (error) {
       res.status(500).send({
@@ -317,23 +331,42 @@ exports.oneDayData = async (req, res) => {
   };
   exports.getGameByTypeSix = async (req, res) => {
     try {
-      const Data = await Game.findAll({
+      const totalAmount = await Game.findAll({
         include: [
-          {
-            model: User,
-            attributes: ["userName"],
-          },
-        ],
-        where: {
-          GameType: 6,
-        },
-        order: [["Amount", "DESC"]],
-        limit: 5,
-      });
+       {
+         model: User,
+         attributes: ["userName"],
+       },
+     ],
+     attributes: [
+       'GameType','userId',
+       [Sequelize.fn('sum', Sequelize.col('Amount')), 'total_amount'],
+     ],
+     group: ['GameType', 'userId','userName'],
+     order: [[Sequelize.col('total_amount'), 'DESC']],
+     raw: true,
+     where: {
+           GameType: 6,
+         },
+     limit:5
+   });
+      // const Data = await Game.findAll({
+      //   include: [
+      //     {
+      //       model: User,
+      //       attributes: ["userName"],
+      //     },
+      //   ],
+      //   where: {
+      //     GameType: 6,
+      //   },
+      //   order: [["Amount", "DESC"]],
+      //   limit: 5,
+      // });
   
       res.status(200).send({
         status: "data of game type 6",
-        data: Data,
+        data: totalAmount,
       });
     } catch (error) {
       res.status(500).send({
@@ -343,23 +376,42 @@ exports.oneDayData = async (req, res) => {
   };
   exports.getGameByTypeNine = async (req, res) => {
     try {
-      const Data = await Game.findAll({
+      
+      // const Data = await Game.findAll({
+      //   include: [
+      //     {
+      //       model: User,
+      //       attributes: ["userName"],
+      //     },
+      //   ],
+      //   where: {
+      //     GameType: 9,
+      //   },
+      //   order: [["Amount", "DESC"]],
+      //   limit: 5,
+      // });
+      const totalAmount = await Game.findAll({
         include: [
-          {
-            model: User,
-            attributes: ["userName"],
-          },
-        ],
-        where: {
-          GameType: 9,
-        },
-        order: [["Amount", "DESC"]],
-        limit: 5,
-      });
-  
+       {
+         model: User,
+         attributes: ["userName"],
+       },
+     ],
+     attributes: [
+       'GameType','userId',
+       [Sequelize.fn('sum', Sequelize.col('Amount')), 'total_amount'],
+     ],
+     group: ['GameType', 'userId','userName'],
+     order: [[Sequelize.col('total_amount'), 'DESC']],
+     raw: true,
+     where: {
+           GameType: 9,
+         },
+     limit:5
+   });
       res.status(200).send({
         status: "data of game type 9 ",
-        data: Data,
+        data: totalAmount,
       });
     } catch (error) {
       res.status(500).send({
@@ -367,8 +419,6 @@ exports.oneDayData = async (req, res) => {
       });
     }
   };
-
-
 
   exports.getAll = async (req, res) => {
     const {userId} = req.query;
