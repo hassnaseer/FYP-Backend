@@ -144,6 +144,28 @@ exports.deleteUser = async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 };
+
+exports.addPlan = async (req, res) => {
+  let { stripePlanId, trialDays, price, interval, description, perMonth } = req.body;
+  try {
+    const user = await Plan.create({
+      stripePlanId,
+      trialDays,
+      price,
+      interval,
+      description,
+      perMonth
+    });
+    res.status(200).send({
+      status: "success",
+      data: user,
+    });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
+
 exports.findPlans = async (req, res) => {
   try {
     const response = await Plan.findAll(

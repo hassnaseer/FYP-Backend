@@ -9,6 +9,7 @@ const userRouter = express.Router();
 
 //get Requests here
 //stripe get plans
+userRouter.route("/addPlan").get(Model.addPlan);
 userRouter.route("/plansGet").get(Model.findPlans);
 userRouter.route("/").get(Model.index);
 userRouter.route("/delete/:id").get(Model.deleteUser);
