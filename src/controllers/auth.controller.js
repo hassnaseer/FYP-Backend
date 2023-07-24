@@ -12,12 +12,11 @@ const status = require("http-status");
 const { User, ForgotPasswordToken } = require("../models/index");
 
 exports.register = async (req, res) => {
-  let { fullName, userName, email, password } = req.body;
-  let sendMail = false;
+  let { fullName, email, password } = req.body;
   const Name = await User.findOne({
-    attributes: ["userName", "password"],
+    attributes: ["fullName", "password"],
     where: {
-      userName: req.body.userName,
+      fullName: fullName,
     },
   });
 
@@ -30,17 +29,13 @@ exports.register = async (req, res) => {
   try {
     const user = await User.create({
       fullName,
-      userName,
       email,
       password: bcrypt.hashSync(password, 8),
     });
-    sendEmail(email, "SuccessFully Registered", password);
-
     res.status(200).send({
       status: "success",
       data: user,
       message: "User Registered Successfully.",
-      // accessToken: token,
     });
   } catch (error) {
     res.status(500).send({ message: error.message });
@@ -50,7 +45,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const user = await User.findOne({
-      attributes: ["userName", "password", "email", "admin", "id", "stripeId"],
+      attributes: ["fullName", "password", "email"],
       where: {
         email: req.body.email,
       },
@@ -225,74 +220,4 @@ exports.userList = async (req, res, next) => {
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
-};
-exports.googleLogin = async (req, res, next) => {
-  const { idToken } = req.body;
-
-  const client = new OAuth2Client(process.env.IOS_GOOGLE_CLIENT_ID);
-
-  const ticket = await client.verifyIdToken({
-    idToken: idToken,
-    audience: process.env.IOS_GOOGLE_CLIENT_ID,
-  });
-
-  const { sub, email, name } = ticket.getPayload();
-
-  let user = await User.findOne({
-    attributes: ["userName", "password", "email", "admin", "id", "stripeId"],
-    where: { googleId: sub },
-  });
-  if (!user) {
-    user = await User.findOne({ where: { email } });
-    if (user) {
-      await user.update({ googleId: sub, userName: name });
-    } else {
-      user = await User.create({
-        googleId: sub,
-        email: email,
-        userName: name,
-      });
-    }
-  } else {
-    await user.update({ userName: name });
-  }
-
-  res.status(status.OK).json({
-    // status: "Success",
-    user:user,
-    message: "Login Successfull",
-    token: user.userName ? user.getJWTToken() : null,
-    // registered: user.userName ? true : false,
-  });
-};
-
-exports.facebookLogin = async (req, res, next) => {
-  let {facebookId, userName} = req.body;
-
-  let user = await User.findOne({ where: { facebookId } });
-  if (!user) {
-    // if (email) user = await User.findOne({ where: { email } });
-
-    // if (user) {
-    //   await user.update({ facebookId, userName });
-    // } else {
-      user = await User.create({
-        facebookId:facebookId,
-        userName: userName,
-      });
-    // }
-  } else {
-    await user.update({ userName: userName });
-  }
-
-  res.status(status.OK).json({
-    // status: messages.SUCCESS,
-    token: user.userName ? user.getJWTToken() : null,
-    message: "Successfully Login",
-    user:user,
-    // registered: user.userName ? true : false,
-    // data: {
-    //   user: await userDetail(user.id),
-    // },
-  });
 };

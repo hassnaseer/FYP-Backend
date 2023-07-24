@@ -1,10 +1,7 @@
 const User = require("../models/user.model");
-const Contact = require("../models/contact.js");
-const {sendEmail} = require('../utils/sendEmail')
-const Plan = require("../models/plansModel");
-const stripe = require("stripe")(process.env.STRIPE_URL);
+const Form = require("../models/form.model");
+const Questions = require("../models/questions.model");
 const Sequelize = require("sequelize");
-// const stripe = require('stripe')('sk_test_4eC39HqLyjWDarjtT1zdp7dc');
 
 exports.index = async (req, res) => {
   try {
@@ -61,6 +58,29 @@ exports.getSingle = async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 };
+
+exports.CreatForm = async (req, res) => {
+  try {
+    const { userId, question, options } = req.body; // Assume the request includes the userId as well
+
+    // Step 1: Create a new form associated with the user
+    const newForm = await Form.create({ userId });
+
+    // Step 2: Create a new question associated with the form (using formId)
+    const newQuestion = await Questions.create({
+      formId: newForm.id, // Use the newly created form's id as the formId
+      question,
+      options,
+    });
+    res.status(200).send({
+      status: "success",
+      data: newQuestion,
+    });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
+
 exports.changeStatus = async (req, res) => {
   try {
     let user = await User.findByPk(req.params.id);
@@ -144,133 +164,3 @@ exports.deleteUser = async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 };
-
-exports.addPlan = async (req, res) => {
-  let { stripePlanId, trialDays, price, interval, description, perMonth } = req.body;
-  try {
-    const user = await Plan.create({
-      stripePlanId,
-      trialDays,
-      price,
-      interval,
-      description,
-      perMonth
-    });
-    res.status(200).send({
-      status: "success",
-      data: user,
-    });
-  } catch (err) {
-    res.status(500).send({ message: err.message });
-  }
-};
-
-
-exports.findPlans = async (req, res) => {
-  try {
-    const response = await Plan.findAll(
-      { order: [["id","ASC"]] }
-      );
-    res.status(200).send({
-      response,
-      status: "Success",
-      // message:"Successfully Paid"
-    });
-  } catch (err) {
-    res.status(500).send({ message: err.message });
-  }
-};
-
-exports.stripePayment = async (req, res) => {
-  let{userId,id} = req.body;
-  try {
-    if(userId === undefined || !userId){
-      res.status(400).send({
-        message:"Please Login for purchase this package!"
-      });
-    }else{
-    const customer =  await stripe.customers.create({
-      description: "customer has been created",
-    });
-    const subscriptions = await stripe.subscriptions.create({
-      customer: customer.id,
-      items: [
-        {price: req.body.priceId},
-      ],
-      payment_behavior: 'default_incomplete',
-      expand: ['latest_invoice.payment_intent'],
-    });
-    await User.update(
-      { stripeId: id },
-      {
-        where: { id: userId},
-      }
-    );
-    res.status(200).send({
-      subscriptions,
-      stripeId: id,
-      status: "Success",
-      message:"Purchased successfully, Now you can Play game by clicking on start Training."
-    });
-  } 
-  } catch (err) {
-    res.status(500).send({ message: err.message });
-  }
-};
-
-exports.stripeUpdate = async (req, res) => {
-  let {subId} = req.body;
-  try {
-    const subscription = await stripe.subscriptions.retrieve(
-      subId
-      // "sub_1L5mLgLo72iSiOk1BG7gUCfE",
-      );
-    const sub = await stripe.subscriptions.update(
-      subId,
-      // "sub_1L5mLgLo72iSiOk1BG7gUCfE",
-       {
-      items: [
-        {
-          id: subscription.items.data[0].id,
-          price: subscription.items.data[0].amount,
-        },
-      ],
-      proration_behavior: "create_prorations",
-    });
-    await User.update(
-      { stripeId: req.body.stripeId },
-      {
-        where: { stripeId: req.body.stripeId },
-      }
-    );
-    res.status(200).send({
-      sub,
-      status: "Success",
-      message:"Successfully Paid, Now you can Play game by clicking on start Training."
-    });
-  }catch (err) {
-    res.status(500).send({ message: err.message });
-  }
-};
-
-exports.contactRequest = async (req, res) => {
-  let { subject, category, email, message } = req.body;
-  try {
-    const user = await Contact.create({
-      subject,
-      category,
-      email,
-      message,
-    });
-    await sendEmail(email, subject, message);
-    res.status(200).send({
-      status: "success",
-      data: user,
-      message: "Email sent successfully",
-    });
-  } catch (err) {
-    res.status(500).send({ message: err.message });
-  }
-};
-
-

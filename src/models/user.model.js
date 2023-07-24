@@ -42,11 +42,6 @@ User.init(
     fullName: {
       type: DataTypes.TEXT,
     },
-    userName: {
-      type: DataTypes.TEXT,
-      // allowNull: false,
-      unique: true,
-    },
     email: {
       type: DataTypes.STRING,
       // allowNull: true,
@@ -56,15 +51,6 @@ User.init(
       type: DataTypes.STRING,
     },
     admin: {
-      type: DataTypes.STRING,
-    },
-    stripeId: {
-      type: DataTypes.STRING,
-    },
-    googleId: {
-      type: DataTypes.STRING,
-    },
-    facebookId: {
       type: DataTypes.STRING,
     },
   },

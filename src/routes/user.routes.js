@@ -9,8 +9,7 @@ const userRouter = express.Router();
 
 //get Requests here
 //stripe get plans
-userRouter.route("/addPlan").get(Model.addPlan);
-userRouter.route("/plansGet").get(Model.findPlans);
+userRouter.route("/creatForm").post(Model.CreatForm);
 userRouter.route("/").get(Model.index);
 userRouter.route("/delete/:id").get(Model.deleteUser);
 userRouter.route("/changeStatus/:id").get(Model.changeStatus);
@@ -19,12 +18,6 @@ userRouter.route("/:id").get(Model.getSingle);
 
 //posts request here
 userRouter.route("/update/:id").put(Model.update);
-//stripe
-userRouter.route("/charges").post(Model.stripePayment); 
-userRouter.route("/upgradeStripe").post(Model.stripeUpdate);
-
-//contact
-userRouter.route("/contact-form").post(Model.contactRequest);
 
 // userRouter.get('/build',function(req,res){
 //     console.log("here")

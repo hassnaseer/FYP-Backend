@@ -1,18 +1,23 @@
 const User = require('./user.model');
-const Game = require('./game');
 const ForgotPasswordToken = require('./forgotPasswordToken.model');
+const Form = require('./form.model');
+const Questions = require('./questions.model');
 
 User.hasOne(ForgotPasswordToken, {
-    onDelete: 'CASCADE',
-    foreignKey: 'userId',
+  onDelete: 'CASCADE',
+  foreignKey: 'userId', // Corrected foreign key field name
 });
 
-User.hasMany(Game, {
-    onDelete: 'CASCADE',
-    foreignKey: 'userId',
+User.hasMany(Form, {
+    foreignKey: {
+        name: 'userId',
+        allowNull: false
+      } // Corrected foreign key field name
 });
 
-Game.belongsTo(User, {
-    onDelete: 'CASCADE',
-    foreignKey: 'userId',
+Form.hasMany(Questions, {
+    foreignKey: {
+        name: 'formId',
+        allowNull: false
+      } // Corrected foreign key field name
 });
